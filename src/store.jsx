@@ -1,9 +1,12 @@
 import { composeWithDevTools } from "@redux-devtools/extension";
 import { useState } from "react";
+import { SiAppgallery } from "react-icons/si";
 import { useDispatch } from "react-redux";
-import { createStore } from "redux";
+import { applyMiddleware, createStore } from "redux";
+import { thunk } from "redux-thunk";
 const add_task = "task/add";
 const delete_task = "task/delete";
+const Fetch_Task = "task/fetch";
 
 const initialState = {
   task: [],
@@ -25,6 +28,11 @@ const taskReducer = (state = initialState, action) => {
         ...state,
         task: updatedTask,
       };
+    case Fetch_Task:
+      return {
+        ...state,
+        task: [...state.task, ...action.payload],
+      };
     default:
       console.log("default");
       break;
@@ -40,7 +48,10 @@ export const deleteTask = (id) => {
   return { type: delete_task, payload: id };
 };
 
-export const store = createStore(taskReducer, composeWithDevTools());
+export const store = createStore(
+  taskReducer,
+  composeWithDevTools(applyMiddleware(thunk)),
+);
 // console.log(store);
 
 //returns current State of redux Application
@@ -63,3 +74,24 @@ console.log("Deleted State:", store.getState());
 //Connect Redux's store and actions to React components. Allows components to access global State and dispatch actions.
 //install react-redux
 //wrap app with Provider
+
+//others ere just action creator
+//fun returning async functions- middleware- REDUX THUNK
+//dispatch arg is present
+export const fetchTask = () => {
+  return async (dispatch) => {
+    try {
+      const res = await fetch(
+        "https://jsonplaceholder.typicode.com/todos?_limit=3",
+      );
+      const task = await res.json();
+      console.log(task);
+      dispatch({
+        type: Fetch_Task,
+        payload: task.map((currTask) => currTask.title),
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+};
