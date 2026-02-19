@@ -20,7 +20,8 @@ export const Todo = () => {
   const handleDeleteTask = (idx) => {
     return dispatch(deleteTask(idx));
   };
-  const task = useSelector((store) => store.task);
+  const task = useSelector((store) => store.taskReducer.task);
+  //const task = useSelector((store) => store.task);
   //console.log("React State:", state);
 
   return (

@@ -1,9 +1,12 @@
 import { composeWithDevTools } from "@redux-devtools/extension";
+import { configureStore, createSlice } from "@reduxjs/toolkit";
 import { useState } from "react";
 import { SiAppgallery } from "react-icons/si";
 import { useDispatch } from "react-redux";
 import { applyMiddleware, createStore } from "redux";
 import { thunk } from "redux-thunk";
+
+//stateDomain and Task
 const add_task = "task/add";
 const delete_task = "task/delete";
 const Fetch_Task = "task/fetch";
@@ -13,8 +16,10 @@ const initialState = {
   isLoading: false,
 };
 
+//your reducer function
 const taskReducer = (state = initialState, action) => {
   switch (action.type) {
+    //defined various actions
     case add_task:
       return {
         ...state,
@@ -35,6 +40,7 @@ const taskReducer = (state = initialState, action) => {
       };
     default:
       console.log("default");
+      return state;
       break;
   }
 };
@@ -48,11 +54,36 @@ export const deleteTask = (id) => {
   return { type: delete_task, payload: id };
 };
 
-export const store = createStore(
-  taskReducer,
-  composeWithDevTools(applyMiddleware(thunk)),
-);
+//old method
+// export const store = createStore(
+//   taskReducer,
+//   composeWithDevTools(applyMiddleware(thunk)),
+// );
 // console.log(store);
+
+//new method
+export const store = configureStore({
+  reducer: {
+    //Reducer func created
+    taskReducer: taskReducer,
+  },
+});
+
+const taskReducerr = createSlice({
+  name: "task", //slice name
+  initialState, //initial State
+  reducers: {
+    //by default action creators are created
+    addTasks(state, action) {
+      state.task.push(action.payload);
+      //state.task=[...state.task,action.payload],
+    },
+    deleteTasks(state, action) {},
+  },
+});
+
+console.log(taskReducerr);
+const { addTasks, deleteTasks } = taskReducerr.actions;
 
 //returns current State of redux Application
 console.log("initialState", store.getState());
